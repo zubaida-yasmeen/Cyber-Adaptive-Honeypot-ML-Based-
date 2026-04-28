@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Activity, Shield, Terminal, BrainCircuit, Network, LayoutDashboard, History, Settings, LogOut, Info, AlertTriangle, Fingerprint, Layers, Cpu } from "lucide-react";
 import { AdaptiveControls } from "@/components/AdaptiveControls";
 import { ThreatScoreChart } from "@/components/ThreatScoreChart";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts';
 
 interface HistoricalEvent {
   id: string;
@@ -175,25 +176,108 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
   );
 }
 
-function PCAMapView() {
+function PCAMapView({ currentPredict }: { currentPredict: any }) {
+  const pcaData = useMemo(() => {
+    const base = [
+      { x: -1.2, y: -0.8, label: 'Normal' },
+      { x: -0.9, y: -1.1, label: 'Normal' },
+      { x: -1.5, y: -0.5, label: 'Normal' },
+      { x: -1.0, y: -1.0, label: 'Normal' },
+      { x: -0.7, y: -0.9, label: 'Normal' },
+      { x: 0.2, y: 0.1, label: 'Suspicious' },
+      { x: 0.5, y: 0.4, label: 'Suspicious' },
+      { x: 0.8, y: 0.2, label: 'Suspicious' },
+      { x: 0.3, y: 0.6, label: 'Suspicious' },
+      { x: 2.1, y: 1.8, label: 'Attack' },
+      { x: 2.5, y: 2.2, label: 'Attack' },
+      { x: 1.8, y: 2.5, label: 'Attack' },
+      { x: 2.3, y: 1.5, label: 'Attack' },
+      { x: 1.9, y: 2.0, label: 'Attack' },
+    ];
+    
+    if (currentPredict?.pca_features) {
+      base.push({
+        x: currentPredict.pca_features[0],
+        y: currentPredict.pca_features[1],
+        label: currentPredict.predicted_class
+      });
+    }
+    return base;
+  }, [currentPredict]);
+
+  const getColor = (label: string) => {
+    switch (label) {
+      case 'Normal': return 'hsl(var(--primary))';
+      case 'Suspicious': return 'hsl(var(--accent))';
+      case 'Attack': return '#f87171'; // red-400
+      default: return '#94a3b8';
+    }
+  };
+
   return (
     <Card className="glass-card animate-in fade-in slide-in-from-bottom-4 duration-500">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Fingerprint className="w-6 h-6 text-accent" />
-          Traffic Principal Component Analysis (PCA)
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="h-[500px] flex items-center justify-center border-2 border-dashed rounded-xl border-white/5 bg-black/20">
-        <div className="text-center space-y-4">
-          <div className="relative inline-block">
-            <Activity className="w-16 h-16 text-accent animate-pulse" />
+        <div className="flex justify-between items-center">
+          <CardTitle className="flex items-center gap-2">
+            <Fingerprint className="w-6 h-6 text-accent" />
+            Traffic Principal Component Analysis (PCA)
+          </CardTitle>
+          <div className="flex gap-4">
+            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-primary" /><span className="text-[10px] font-bold uppercase">Normal</span></div>
+            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-accent" /><span className="text-[10px] font-bold uppercase">Suspicious</span></div>
+            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-400" /><span className="text-[10px] font-bold uppercase">Attack</span></div>
           </div>
-          <h3 className="text-xl font-headline font-bold">Dimensionality Reduction Engine</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Mapping multi-dimensional network features into 2D space to visualize anomalous clusters in real-time.
-          </p>
         </div>
+      </CardHeader>
+      <CardContent className="h-[500px] border rounded-xl border-white/5 bg-black/20 p-8">
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={true} />
+            <XAxis 
+              type="number" 
+              dataKey="x" 
+              name="PC1" 
+              stroke="rgba(255,255,255,0.3)" 
+              fontSize={10} 
+              label={{ value: 'Principal Component 1', position: 'bottom', fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
+            />
+            <YAxis 
+              type="number" 
+              dataKey="y" 
+              name="PC2" 
+              stroke="rgba(255,255,255,0.3)" 
+              fontSize={10}
+              label={{ value: 'Principal Component 2', angle: -90, position: 'left', fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
+            />
+            <ZAxis type="number" range={[100, 400]} />
+            <Tooltip 
+              cursor={{ strokeDasharray: '3 3' }}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="bg-card border border-white/10 p-2 rounded shadow-xl text-[10px] font-code">
+                      <div className="font-bold text-accent uppercase mb-1">{data.label}</div>
+                      <div>X: {data.x.toFixed(4)}</div>
+                      <div>Y: {data.y.toFixed(4)}</div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
+            <Scatter name="Network Traffic" data={pcaData} shape="circle">
+              {pcaData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={getColor(entry.label)} 
+                  className="transition-all duration-700"
+                  style={{ filter: index === pcaData.length - 1 ? 'drop-shadow(0 0 10px currentColor)' : 'none' }}
+                />
+              ))}
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );
@@ -449,7 +533,7 @@ export default function Dashboard() {
               isExplaining={isExplaining} 
             />
           )}
-          {activeView === "pca" && <PCAMapView />}
+          {activeView === "pca" && <PCAMapView currentPredict={currentPredict} />}
           {activeView === "clustering" && <ClusteringView />}
           {activeView === "qlearning" && <QLearningView />}
           {activeView === "params" && <MLParamsView />}
