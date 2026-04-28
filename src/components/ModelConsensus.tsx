@@ -29,7 +29,7 @@ export function ModelConsensus({ models }: ModelConsensusProps) {
   ];
 
   return (
-    <Card className="glass-card">
+    <Card className="glass-card transition-all duration-500">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">Model Pipeline Consensus</CardTitle>
       </CardHeader>
@@ -37,16 +37,16 @@ export function ModelConsensus({ models }: ModelConsensusProps) {
         {modelConfigs.map((m) => {
           const mData = (models as any)[m.key];
           return (
-            <div key={m.key} className="flex flex-col gap-1 p-2 rounded bg-white/5 border border-white/5">
+            <div key={m.key} className="flex flex-col gap-1 p-2 rounded bg-white/5 border border-white/5 transition-all duration-300 hover:bg-white/10">
               <div className="flex items-center gap-2 mb-1">
                 <m.icon className="w-3 h-3 text-muted-foreground" />
                 <span className="text-[10px] font-semibold text-muted-foreground uppercase">{m.name}</span>
               </div>
               <div className="flex items-center justify-between">
-                <Badge variant="outline" className={`text-[10px] py-0 px-1.5 ${getLabelColor(mData.label)}`}>
+                <Badge variant="outline" className={`text-[10px] py-0 px-1.5 transition-all duration-500 ${getLabelColor(mData.label)}`}>
                   {mData.label}
                 </Badge>
-                <span className="text-[9px] text-muted-foreground font-code">{m.detail}</span>
+                <span className="text-[9px] text-muted-foreground font-code transition-all duration-300">{m.detail}</span>
               </div>
             </div>
           );

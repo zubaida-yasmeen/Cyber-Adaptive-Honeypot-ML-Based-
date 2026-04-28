@@ -10,7 +10,7 @@ interface ThreatScoreChartProps {
 
 export function ThreatScoreChart({ data }: ThreatScoreChartProps) {
   return (
-    <Card className="glass-card col-span-2">
+    <Card className="glass-card col-span-2 transition-all duration-500">
       <CardHeader>
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -45,7 +45,9 @@ export function ThreatScoreChart({ data }: ThreatScoreChartProps) {
               stroke="var(--color-score)"
               strokeWidth={2}
               dot={false}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
             />
           </LineChart>
         </ChartContainer>

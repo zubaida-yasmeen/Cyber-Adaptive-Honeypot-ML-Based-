@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface HistoricalEvent {
+  id: string;
   time: string;
   score: number;
   class: string;
@@ -26,7 +27,7 @@ type ActiveView = "dashboard" | "pca" | "clustering" | "qlearning" | "params";
 // Sub-view Components
 function DashboardView({ currentPredict, history, explanation, isExplaining }: any) {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-in fade-in duration-700">
       <div className="xl:col-span-2 space-y-8">
         <AdaptiveControls 
           predictedClass={currentPredict?.predicted_class} 
@@ -52,10 +53,10 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
             </CardHeader>
             <CardContent>
               {currentPredict ? (
-                <div className="font-code text-[11px] bg-black/40 p-5 rounded-xl border border-white/5 space-y-3">
+                <div className="font-code text-[11px] bg-black/40 p-5 rounded-xl border border-white/5 space-y-3 transition-all duration-500">
                   <div className="flex justify-between items-center bg-white/5 p-2 rounded">
                     <span className="text-muted-foreground">PCA COORDINATES:</span>
-                    <span className="text-accent font-bold">[{currentPredict.pca_features[0].toFixed(3)}, {currentPredict.pca_features[1].toFixed(3)}]</span>
+                    <span className="text-accent font-bold animate-in zoom-in-95 duration-300">[{currentPredict.pca_features[0].toFixed(3)}, {currentPredict.pca_features[1].toFixed(3)}]</span>
                   </div>
                   <div className="space-y-1 pt-2">
                     <div className="flex justify-between border-b border-white/5 pb-1">
@@ -64,15 +65,15 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
                     </div>
                     <div className="flex justify-between border-b border-white/5 pb-1">
                       <span className="text-muted-foreground uppercase">Freq Norm:</span>
-                      <span>{currentPredict.features[0].toFixed(4)}</span>
+                      <span className="transition-all duration-300">{currentPredict.features[0].toFixed(4)}</span>
                     </div>
                     <div className="flex justify-between border-b border-white/5 pb-1">
                       <span className="text-muted-foreground uppercase">Payload Norm:</span>
-                      <span>{currentPredict.features[1].toFixed(4)}</span>
+                      <span className="transition-all duration-300">{currentPredict.features[1].toFixed(4)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground uppercase">Special Chars:</span>
-                      <span className={currentPredict.input.special_chars > 5 ? "text-red-400 font-bold" : ""}>{currentPredict.input.special_chars}</span>
+                      <span className={cn("transition-all duration-300", currentPredict.input.special_chars > 5 ? "text-red-400 font-bold" : "")}>{currentPredict.input.special_chars}</span>
                     </div>
                   </div>
                 </div>
@@ -98,14 +99,14 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
             <CardContent>
               <div className="relative">
                 {isExplaining && (
-                  <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
+                  <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center rounded-lg z-10 animate-in fade-in duration-300">
                     <div className="flex flex-col items-center gap-3">
                       <Activity className="w-6 h-6 animate-spin text-primary" />
                       <span className="text-xs font-bold uppercase tracking-widest">Generating Logic...</span>
                     </div>
                   </div>
                 )}
-                <div className="min-h-[120px] p-5 rounded-xl bg-primary/5 border border-primary/10 text-xs leading-relaxed text-foreground/80 italic font-medium">
+                <div className="min-h-[120px] p-5 rounded-xl bg-primary/5 border border-primary/10 text-xs leading-relaxed text-foreground/80 italic font-medium transition-all duration-1000">
                   {explanation || "Awaiting sensor data for logical decomposition..."}
                 </div>
               </div>
@@ -130,13 +131,13 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
           <CardContent className="flex-1 p-0">
             <ScrollArea className="h-full px-6 py-4">
               <div className="space-y-6 pb-6">
-                {history.map((item: any, i: number) => (
-                  <div key={i} className="group relative flex items-start justify-between border-b border-white/5 pb-5 last:border-0 hover:bg-white/[0.02] transition-colors p-2 rounded-lg -mx-2">
+                {history.map((item: HistoricalEvent) => (
+                  <div key={item.id} className="group relative flex items-start justify-between border-b border-white/5 pb-5 last:border-0 hover:bg-white/[0.02] transition-all duration-300 p-2 rounded-lg -mx-2 animate-in fade-in slide-in-from-top-4">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
                         <span className="text-[10px] font-code text-muted-foreground">{item.time}</span>
                         <Badge className={cn(
-                          "text-[9px] font-bold uppercase px-1.5 py-0",
+                          "text-[9px] font-bold uppercase px-1.5 py-0 transition-colors duration-300",
                           item.class === 'Attack' ? "bg-red-500/20 text-red-400 border-red-500/20" :
                           item.class === 'Suspicious' ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/20" :
                           "bg-green-500/20 text-green-400 border-green-500/20"
@@ -145,12 +146,12 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
                         </Badge>
                       </div>
                       <div className="text-[11px] font-bold tracking-tight">
-                        {item.payload} B → <span className="text-accent italic">{item.action}</span>
+                        {item.payload} B → <span className="text-accent italic transition-colors duration-300">{item.action}</span>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className={cn(
-                        "text-sm font-bold",
+                        "text-sm font-bold transition-colors duration-300",
                         item.score > 75 ? "text-red-400" : item.score > 40 ? "text-yellow-400" : "text-green-400"
                       )}>
                         {item.score}%
@@ -176,7 +177,7 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
 
 function PCAMapView() {
   return (
-    <Card className="glass-card">
+    <Card className="glass-card animate-in fade-in slide-in-from-bottom-4 duration-500">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Fingerprint className="w-6 h-6 text-accent" />
@@ -200,7 +201,7 @@ function PCAMapView() {
 
 function ClusteringView() {
   return (
-    <Card className="glass-card">
+    <Card className="glass-card animate-in fade-in slide-in-from-bottom-4 duration-500">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Network className="w-6 h-6 text-primary" />
@@ -222,7 +223,7 @@ function ClusteringView() {
 
 function QLearningView() {
   return (
-    <Card className="glass-card">
+    <Card className="glass-card animate-in fade-in slide-in-from-bottom-4 duration-500">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Cpu className="w-6 h-6 text-yellow-400" />
@@ -244,7 +245,7 @@ function QLearningView() {
 
 function MLParamsView() {
   return (
-    <Card className="glass-card">
+    <Card className="glass-card animate-in fade-in slide-in-from-bottom-4 duration-500">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Layers className="w-6 h-6 text-accent" />
@@ -279,6 +280,7 @@ export default function Dashboard() {
       setCurrentPredict(data);
       
       const newEvent: HistoricalEvent = {
+        id: Math.random().toString(36).substring(7),
         time: new Date().toLocaleTimeString(),
         score: data.threat_score,
         class: data.predicted_class,
@@ -326,8 +328,8 @@ export default function Dashboard() {
 
   const getNavStyle = (view: ActiveView) => 
     activeView === view 
-      ? "w-full justify-start gap-3 bg-primary/10 text-primary border-l-2 border-l-primary rounded-none" 
-      : "w-full justify-start gap-3 text-muted-foreground hover:text-foreground";
+      ? "w-full justify-start gap-3 bg-primary/10 text-primary border-l-2 border-l-primary rounded-none transition-all duration-300" 
+      : "w-full justify-start gap-3 text-muted-foreground hover:text-foreground transition-all duration-300";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -407,7 +409,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          <Button variant="ghost" className="w-full justify-start gap-3 text-destructive/70 hover:text-destructive hover:bg-destructive/10">
+          <Button variant="ghost" className="w-full justify-start gap-3 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-colors">
             <LogOut className="w-4 h-4" />
             System Shutdown
           </Button>
@@ -418,42 +420,44 @@ export default function Dashboard() {
       <main className="flex-1 overflow-y-auto p-10 space-y-8">
         <header className="flex items-center justify-between">
           <div className="space-y-1">
-            <h1 className="text-4xl font-headline font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/40 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-headline font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/40 bg-clip-text text-transparent animate-in slide-in-from-left-4 duration-500">
               {activeView === "dashboard" && "Threat Intelligence Hub"}
               {activeView === "pca" && "Traffic Map Visualization"}
               {activeView === "clustering" && "Traffic Clustering"}
               {activeView === "qlearning" && "Adaptive Policy Engine"}
               {activeView === "params" && "ML Pipeline Config"}
             </h1>
-            <p className="text-muted-foreground text-sm font-medium">Real-time explainable ML analysis for adaptive network response.</p>
+            <p className="text-muted-foreground text-sm font-medium animate-in slide-in-from-left-4 duration-700">Real-time explainable ML analysis for adaptive network response.</p>
           </div>
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-muted/30 border border-white/5">
-              <div className={cn("w-2.5 h-2.5 rounded-full", isLive ? "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]" : "bg-red-400")} />
+            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-muted/30 border border-white/5 transition-all duration-300">
+              <div className={cn("w-2.5 h-2.5 rounded-full transition-all duration-500", isLive ? "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]" : "bg-red-400")} />
               <span className="text-xs font-bold tracking-widest uppercase">{isLive ? "Live Stream" : "System Paused"}</span>
             </div>
-            <Button onClick={() => setIsLive(!isLive)} variant={isLive ? "outline" : "default"} size="sm" className="px-6 rounded-full font-bold">
+            <Button onClick={() => setIsLive(!isLive)} variant={isLive ? "outline" : "default"} size="sm" className="px-6 rounded-full font-bold transition-all duration-300 transform hover:scale-105 active:scale-95">
               {isLive ? "Pause Sensors" : "Resume Analysis"}
             </Button>
           </div>
         </header>
 
-        {activeView === "dashboard" && (
-          <DashboardView 
-            currentPredict={currentPredict} 
-            history={history} 
-            explanation={explanation} 
-            isExplaining={isExplaining} 
-          />
-        )}
-        {activeView === "pca" && <PCAMapView />}
-        {activeView === "clustering" && <ClusteringView />}
-        {activeView === "qlearning" && <QLearningView />}
-        {activeView === "params" && <MLParamsView />}
+        <div className="relative transition-all duration-500">
+          {activeView === "dashboard" && (
+            <DashboardView 
+              currentPredict={currentPredict} 
+              history={history} 
+              explanation={explanation} 
+              isExplaining={isExplaining} 
+            />
+          )}
+          {activeView === "pca" && <PCAMapView />}
+          {activeView === "clustering" && <ClusteringView />}
+          {activeView === "qlearning" && <QLearningView />}
+          {activeView === "params" && <MLParamsView />}
+        </div>
 
         {activeView === "dashboard" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-            <Card className="bg-primary/10 border-primary/20 relative overflow-hidden group col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 animate-in fade-in duration-1000">
+            <Card className="bg-primary/10 border-primary/20 relative overflow-hidden group col-span-1 transition-all duration-500 hover:shadow-primary/5">
               <div className="absolute -top-4 -right-4 p-2 opacity-5 group-hover:opacity-10 transition-transform duration-700 group-hover:scale-110">
                 <Shield className="w-32 h-32" />
               </div>
@@ -465,7 +469,7 @@ export default function Dashboard() {
                   <div className="text-5xl font-headline font-black text-primary tracking-tighter">100<span className="text-2xl opacity-50">%</span></div>
                   <div className="mb-2">
                     <div className="flex gap-0.5">
-                      {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-3 bg-primary rounded-full" />)}
+                      {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-3 bg-primary rounded-full transition-all duration-300 hover:h-4" />)}
                     </div>
                   </div>
                 </div>
@@ -476,19 +480,19 @@ export default function Dashboard() {
             </Card>
 
             <div className="flex gap-4 col-span-1 md:col-span-2">
-               <div className="flex-1 p-4 rounded-xl border bg-yellow-500/5 border-yellow-500/20">
+               <div className="flex-1 p-4 rounded-xl border bg-yellow-500/5 border-yellow-500/20 transition-all duration-500 hover:bg-yellow-500/10">
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="w-4 h-4 text-yellow-400" />
                     <span className="text-[10px] font-bold text-yellow-400 uppercase">Alerts</span>
                   </div>
-                  <div className="text-xl font-bold">03</div>
+                  <div className="text-xl font-bold animate-in zoom-in duration-300">03</div>
                </div>
-               <div className="flex-1 p-4 rounded-xl border bg-red-500/5 border-red-500/20">
+               <div className="flex-1 p-4 rounded-xl border bg-red-500/5 border-red-500/20 transition-all duration-500 hover:bg-red-500/10">
                   <div className="flex items-center gap-2 mb-2">
                     <Shield className="w-4 h-4 text-red-400" />
                     <span className="text-[10px] font-bold text-red-400 uppercase">Blocks</span>
                   </div>
-                  <div className="text-xl font-bold">12</div>
+                  <div className="text-xl font-bold animate-in zoom-in duration-300">12</div>
                </div>
             </div>
           </div>
