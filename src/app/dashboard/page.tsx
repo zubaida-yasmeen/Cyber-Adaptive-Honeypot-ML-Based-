@@ -28,7 +28,7 @@ type ActiveView = "dashboard" | "pca" | "clustering" | "qlearning" | "params";
 // Sub-view Components
 function DashboardView({ currentPredict, history, explanation, isExplaining }: any) {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-in fade-in duration-700">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-in fade-in duration-700 items-start">
       <div className="xl:col-span-2 space-y-8">
         <AdaptiveControls 
           predictedClass={currentPredict?.predicted_class} 
@@ -119,17 +119,59 @@ function DashboardView({ currentPredict, history, explanation, isExplaining }: a
             </CardContent>
           </Card>
         </div>
+
+        {/* Summary Row Moved inside the Span-2 Column for consistent layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+          <Card className="bg-primary/10 border-primary/20 relative overflow-hidden group col-span-1 transition-all duration-500 hover:shadow-primary/5">
+            <div className="absolute -top-4 -right-4 p-2 opacity-5 group-hover:opacity-10 transition-transform duration-700 group-hover:scale-110">
+              <Shield className="w-32 h-32" />
+            </div>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">System Integrity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-end gap-3">
+                <div className="text-5xl font-headline font-black text-primary tracking-tighter">100<span className="text-2xl opacity-50">%</span></div>
+                <div className="mb-2">
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-3 bg-primary rounded-full transition-all duration-300 hover:h-4" />)}
+                  </div>
+                </div>
+              </div>
+              <p className="text-[10px] leading-relaxed text-primary/70 mt-4 font-medium">
+                Honeypot sandbox isolated. All suspicious nodes are automatically redirected to high-latency tarpits.
+              </p>
+            </CardContent>
+          </Card>
+
+          <div className="flex gap-4 col-span-1 md:col-span-2">
+             <div className="flex-1 p-4 rounded-xl border bg-yellow-500/5 border-yellow-500/20 transition-all duration-500 hover:bg-yellow-500/10">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-[10px] font-bold text-yellow-400 uppercase">Alerts</span>
+                </div>
+                <div className="text-xl font-bold animate-in zoom-in duration-300">03</div>
+             </div>
+             <div className="flex-1 p-4 rounded-xl border bg-red-500/5 border-red-500/20 transition-all duration-500 hover:bg-red-500/10">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="w-4 h-4 text-red-400" />
+                  <span className="text-[10px] font-bold text-red-400 uppercase">Blocks</span>
+                </div>
+                <div className="text-xl font-bold animate-in zoom-in duration-300">12</div>
+             </div>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-8">
-        <Card className="glass-card flex flex-col h-[calc(100vh-14rem)]">
+      <div className="space-y-8 xl:sticky xl:top-0">
+        <Card className="glass-card flex flex-col h-[calc(100vh-12rem)] min-h-[600px]">
           <CardHeader className="border-b border-white/5 pb-4">
             <CardTitle className="text-sm font-bold flex items-center gap-2 uppercase tracking-widest">
               <Activity className="w-4 h-4 text-primary" />
               Request Stream
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 p-0">
+          <CardContent className="flex-1 p-0 overflow-hidden">
             <ScrollArea className="h-full px-6 py-4">
               <div className="space-y-6 pb-6">
                 {history.map((item: HistoricalEvent) => (
@@ -538,49 +580,6 @@ export default function Dashboard() {
           {activeView === "qlearning" && <QLearningView />}
           {activeView === "params" && <MLParamsView />}
         </div>
-
-        {activeView === "dashboard" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 animate-in fade-in duration-1000">
-            <Card className="bg-primary/10 border-primary/20 relative overflow-hidden group col-span-1 transition-all duration-500 hover:shadow-primary/5">
-              <div className="absolute -top-4 -right-4 p-2 opacity-5 group-hover:opacity-10 transition-transform duration-700 group-hover:scale-110">
-                <Shield className="w-32 h-32" />
-              </div>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">System Integrity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end gap-3">
-                  <div className="text-5xl font-headline font-black text-primary tracking-tighter">100<span className="text-2xl opacity-50">%</span></div>
-                  <div className="mb-2">
-                    <div className="flex gap-0.5">
-                      {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-3 bg-primary rounded-full transition-all duration-300 hover:h-4" />)}
-                    </div>
-                  </div>
-                </div>
-                <p className="text-[10px] leading-relaxed text-primary/70 mt-4 font-medium">
-                  Honeypot sandbox isolated. All suspicious nodes are automatically redirected to high-latency tarpits via RL agent.
-                </p>
-              </CardContent>
-            </Card>
-
-            <div className="flex gap-4 col-span-1 md:col-span-2">
-               <div className="flex-1 p-4 rounded-xl border bg-yellow-500/5 border-yellow-500/20 transition-all duration-500 hover:bg-yellow-500/10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                    <span className="text-[10px] font-bold text-yellow-400 uppercase">Alerts</span>
-                  </div>
-                  <div className="text-xl font-bold animate-in zoom-in duration-300">03</div>
-               </div>
-               <div className="flex-1 p-4 rounded-xl border bg-red-500/5 border-red-500/20 transition-all duration-500 hover:bg-red-500/10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="w-4 h-4 text-red-400" />
-                    <span className="text-[10px] font-bold text-red-400 uppercase">Blocks</span>
-                  </div>
-                  <div className="text-xl font-bold animate-in zoom-in duration-300">12</div>
-               </div>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );
